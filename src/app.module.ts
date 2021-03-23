@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { TodoModule } from './todo/todo.module';
 
 @Module({
   imports: [
     TodoModule,
-    MongooseModule.forRootAsync({
-      useFactory: () => ({
-        uri: process.env.MONGO_URI,
-      }),
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: ':memory:',
+      entities: ['dist/**/*.entity{.ts,.js}'],
+      synchronize: true,
     }),
+    GraphQLModule.forRoot({ autoSchemaFile: true }),
     ConfigModule.forRoot({ isGlobal: true }),
   ],
 })

@@ -1,20 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { CreateTodoDto } from './dto/todo.dto';
-import { Todo } from './interfaces/todo.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Todo } from 'src/entity/todo.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TodoService {
   public constructor(
-    @InjectModel('Todo') private readonly todoModel: Model<Todo>,
+    @InjectRepository(Todo) private readonly todoRepository: Repository<Todo>,
   ) {}
 
-  async create(createTodoDto: CreateTodoDto): Promise<Todo> {
-    return this.todoModel.create({ title: createTodoDto.title });
+  async create(title: string): Promise<Todo> {
+    const todo = this.todoRepository.create({ title });
+    return this.todoRepository.save(todo);
+  }
+
+  async delete(id: number): Promise<boolean> {
+    try {
+      this.todoRepository.delete(id);
+      return true;
+    } catch (error) {
+      throw new Error('something went wrong');
+    }
   }
 
   async findAll(): Promise<Todo[]> {
-    return this.todoModel.find();
+    return this.todoRepository.find();
   }
 }
