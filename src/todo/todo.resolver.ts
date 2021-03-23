@@ -11,10 +11,13 @@ import { Todo } from 'src/entity/todo.entity';
 import { CreateTodoInput } from './dto/input/create-todo-input.dto';
 import { TodoService } from './todo.service';
 
-const pubSub = new PubSub();
 @Resolver(() => Todo)
 export class TodoResolver {
-  constructor(private readonly todoService: TodoService) {}
+  private pubSub: PubSub;
+
+  constructor(private readonly todoService: TodoService) {
+    this.pubSub = new PubSub();
+  }
 
   @Query(() => [Todo])
   async getTodos(): Promise<Todo[]> {
@@ -27,7 +30,7 @@ export class TodoResolver {
   ): Promise<Todo> {
     const todo = await this.todoService.createTodo(createTodoInput.title);
 
-    pubSub.publish('todoCreated', { todoCreated: todo });
+    this.pubSub.publish('todoCreated', { todoCreated: todo });
 
     return todo;
   }
@@ -48,6 +51,6 @@ export class TodoResolver {
 
   @Subscription(() => Todo)
   async todoCreated() {
-    return pubSub.asyncIterator('todoCreated');
+    return this.pubSub.asyncIterator('todoCreated');
   }
 }
