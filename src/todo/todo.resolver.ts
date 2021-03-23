@@ -8,21 +8,28 @@ export class TodoResolver {
   constructor(private readonly todoService: TodoService) {}
 
   @Query(() => [Todo])
-  async todos(): Promise<Todo[]> {
-    return this.todoService.findAll();
+  async getTodos(): Promise<Todo[]> {
+    return this.todoService.getTodos();
   }
 
   @Mutation(() => Todo)
   async createTodo(
     @Args('createTodoInput') createTodoInput: CreateTodoInput,
   ): Promise<Todo> {
-    return this.todoService.create(createTodoInput.title);
+    return this.todoService.createTodo(createTodoInput.title);
   }
 
   @Mutation(() => Boolean)
   async deleteTodo(
     @Args('id', { type: () => Int }) id: number,
   ): Promise<boolean> {
-    return this.todoService.delete(id);
+    return this.todoService.deleteTodo(id);
+  }
+
+  @Mutation(() => Todo)
+  async markTodoAsCompleted(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<Todo> {
+    return this.todoService.markTodoAsCompleted(id);
   }
 }
