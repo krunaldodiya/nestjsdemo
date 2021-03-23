@@ -13,7 +13,10 @@ import { TodoModule } from './todo/todo.module';
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    GraphQLModule.forRoot({ autoSchemaFile: true }),
+    GraphQLModule.forRoot({
+      autoSchemaFile: true,
+      installSubscriptionHandlers: true,
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
   ],
 })

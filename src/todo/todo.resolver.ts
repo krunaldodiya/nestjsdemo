@@ -1,8 +1,17 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
+import { PubSub } from 'apollo-server-express';
 import { Todo } from 'src/entity/todo.entity';
 import { CreateTodoInput } from './dto/input/create-todo-input.dto';
 import { TodoService } from './todo.service';
 
+const pubSub = new PubSub();
 @Resolver(() => Todo)
 export class TodoResolver {
   constructor(private readonly todoService: TodoService) {}
@@ -16,7 +25,11 @@ export class TodoResolver {
   async createTodo(
     @Args('createTodoInput') createTodoInput: CreateTodoInput,
   ): Promise<Todo> {
-    return this.todoService.createTodo(createTodoInput.title);
+    const todo = await this.todoService.createTodo(createTodoInput.title);
+
+    pubSub.publish('todoCreated', { todoCreated: todo });
+
+    return todo;
   }
 
   @Mutation(() => Boolean)
@@ -31,5 +44,10 @@ export class TodoResolver {
     @Args('id', { type: () => Int }) id: number,
   ): Promise<Todo> {
     return this.todoService.markTodoAsCompleted(id);
+  }
+
+  @Subscription(() => Todo)
+  async todoCreated() {
+    return pubSub.asyncIterator('todoCreated');
   }
 }
