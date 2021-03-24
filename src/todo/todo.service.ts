@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Todo } from 'src/entity/todo.entity';
 import { Repository } from 'typeorm';
@@ -14,7 +14,7 @@ export class TodoService {
       const todo = this.todoRepository.create({ title });
       return this.todoRepository.save(todo);
     } catch (error) {
-      throw new Error('something went wrong');
+      throw new HttpException('something went wrong', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -23,7 +23,7 @@ export class TodoService {
       this.todoRepository.delete(id);
       return true;
     } catch (error) {
-      throw new Error('something went wrong');
+      throw new HttpException('something went wrong', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -32,7 +32,7 @@ export class TodoService {
       await this.todoRepository.update({ id }, { completed: true });
       return this.findTodoById(id);
     } catch (error) {
-      throw new Error('something went wrong');
+      throw new HttpException('something went wrong', HttpStatus.BAD_REQUEST);
     }
   }
 
