@@ -16,6 +16,9 @@ import { TodoModule } from './todo/todo.module';
     GraphQLModule.forRoot({
       autoSchemaFile: true,
       installSubscriptionHandlers: true,
+      context: ({ req }) => ({
+        headers: req.headers,
+      }),
     }),
     ConfigModule.forRoot({ isGlobal: true }),
   ],
